@@ -5,7 +5,6 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import javax.swing.*;
 import javax.swing.border.AbstractBorder;
@@ -485,7 +484,7 @@ class SystemGarcia extends JFrame {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
             databaseConnection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
-            initializeDatabase();
+            Database.initialize(databaseConnection);
 
             books.clear();
             String sql = "SELECT book_id, title, author, category_name, borrowed FROM books ORDER BY title";
@@ -508,26 +507,6 @@ class SystemGarcia extends JFrame {
         } catch (SQLException e) {
             dataFileValid = false;
             loadError = "Could not connect to MySQL database.\n" + e.getMessage();
-        }
-    }
-
-    private void initializeDatabase() throws SQLException {
-        try (Statement statement = databaseConnection.createStatement()) {
-            statement.executeUpdate(
-                    "CREATE TABLE IF NOT EXISTS categories ("
-                            + "category_name VARCHAR(100) PRIMARY KEY"
-                            + ")");
-            statement.executeUpdate(
-                    "CREATE TABLE IF NOT EXISTS books ("
-                            + "book_id VARCHAR(100) PRIMARY KEY,"
-                            + "title VARCHAR(255) NOT NULL,"
-                            + "author VARCHAR(255) NOT NULL,"
-                            + "category_name VARCHAR(100) NOT NULL,"
-                            + "borrowed BOOLEAN NOT NULL DEFAULT FALSE,"
-                            + "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,"
-                            + "updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,"
-                            + "FOREIGN KEY (category_name) REFERENCES categories(category_name)"
-                            + ")");
         }
     }
 
